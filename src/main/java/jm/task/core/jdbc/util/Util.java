@@ -39,6 +39,7 @@ public class Util {
                         .applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(builder.build());
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
         }
