@@ -6,11 +6,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
     UserDaoJDBCImpl userDaoJDBC = new UserDaoJDBCImpl();
+    Session session;
 
     public UserDaoHibernateImpl() {
 
@@ -20,50 +22,69 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         userDaoJDBC.createUsersTable();
+//        Session session = Util.getSessionFactory().openSession();
+//        session.beginTransaction();
+//        Query query = session.createSQLQuery("CREATE TABLE IF NOT EXISTS testtable(id int primary key auto_increment, name varchar(40), lastName varchar(40), age int );");
+//        query.executeUpdate();
+//        session.getTransaction().commit();
+//        session.close();
     }
 
     @Override
     public void dropUsersTable() {
         userDaoJDBC.dropUsersTable();
+//        Session session = Util.getSessionFactory().openSession();
+//        session.beginTransaction();
+//        int hql = session.createSQLQuery("DROP TABLE IF EXISTS testtable;").executeUpdate();
+//        session.getTransaction().commit();
+//        session.close();
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        User user = new User(name, lastName, age);
-        Session session = Util.getSessionFactory().openSession();
+        User user = new User();
+        user.setName(name);
+        user.setLastName(lastName);
+        user.setAge(age);
+        session = Util.getSessionFactory().openSession();
         session.beginTransaction();
         session.save(user);
         session.getTransaction().commit();
         session.close();
-        System.out.println("User с именем – " + name + " добавлен в базу данных");
     }
 
     @Override
     public void removeUserById(long id) {
-        Session session = Util.getSessionFactory().openSession();
+        session = Util.getSessionFactory().openSession();
         session.beginTransaction();
-        String hql = "delete User where id = " + id;
-//        Query query = session.createQuery("delete User where id = :param");
-        Query query = session.createQuery(hql);
-//        query.setParameter("param", id);
+
+//        String hql = "delete User where id = " + id;
+//        Query query = session.createSQLQuery(hql);
+
+        Query query = session.createSQLQuery("delete User where id = :param");
+        query.setParameter("param", id);
+
         int result = query.executeUpdate();
+
         session.getTransaction().commit();
         session.close();
     }
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = (List<User>) Util.getSessionFactory().openSession().createQuery("FROM User").list();
+        List<User> users;
+        session = Util.getSessionFactory().openSession();
+        users = session.createQuery("FROM User").list();
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        Session session = Util.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        Query query = session.createQuery("TRUNCATE testtable");
+        session = Util.getSessionFactory().openSession();
+        session.beginTransaction();
+        Query query = session.createSQLQuery("TRUNCATE TABLE testtable");
         int result = query.executeUpdate();
-        tx1.commit();
+        session.getTransaction().commit();
         session.close();
     }
 }
