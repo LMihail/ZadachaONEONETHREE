@@ -6,7 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
@@ -21,23 +21,23 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        userDaoJDBC.createUsersTable();
-//        Session session = Util.getSessionFactory().openSession();
-//        session.beginTransaction();
-//        Query query = session.createSQLQuery("CREATE TABLE IF NOT EXISTS testtable(id int primary key auto_increment, name varchar(40), lastName varchar(40), age int );");
-//        query.executeUpdate();
-//        session.getTransaction().commit();
-//        session.close();
+        session = Util.getSessionFactory().openSession();
+        session.beginTransaction();
+        Query query = session.createSQLQuery("CREATE TABLE IF NOT EXISTS testtable(ID int primary key auto_increment, NAME varchar(40), LASTNAME varchar(40), AGE int );");
+        query.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void dropUsersTable() {
-        userDaoJDBC.dropUsersTable();
-//        Session session = Util.getSessionFactory().openSession();
-//        session.beginTransaction();
-//        int hql = session.createSQLQuery("DROP TABLE IF EXISTS testtable;").executeUpdate();
-//        session.getTransaction().commit();
-//        session.close();
+        session = Util.getSessionFactory().openSession();
+        session.beginTransaction();
+        int hql = session.createSQLQuery("DROP TABLE IF EXISTS testtable;")
+                .executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+
     }
 
     @Override
@@ -57,15 +57,9 @@ public class UserDaoHibernateImpl implements UserDao {
     public void removeUserById(long id) {
         session = Util.getSessionFactory().openSession();
         session.beginTransaction();
-
-//        String hql = "delete User where id = " + id;
-//        Query query = session.createSQLQuery(hql);
-
         Query query = session.createSQLQuery("delete User where id = :param");
         query.setParameter("param", id);
-
         int result = query.executeUpdate();
-
         session.getTransaction().commit();
         session.close();
     }
@@ -73,8 +67,12 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users;
-        session = Util.getSessionFactory().openSession();
-        users = session.createQuery("FROM User").list();
+        Session session = Util.getSessionFactory().openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from User");
+        users = query.list();
+        session.getTransaction().commit();
+        session.close();
         return users;
     }
 

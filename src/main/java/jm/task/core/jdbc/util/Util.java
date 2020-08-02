@@ -4,6 +4,7 @@ import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -34,11 +35,11 @@ public class Util {
                         .setProperty("hibernate.show_sql", "true")
                         .setProperty("hibernate.hbm2ddl.auto", "update");
 
-                StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(builder.build());
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Исключение!" + e);
             }
         }
         return sessionFactory;
